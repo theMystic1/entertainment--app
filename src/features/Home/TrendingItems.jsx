@@ -20,7 +20,7 @@ function TrendingItems({ movie }) {
 
   return (
     <div
-      className="bg-cover bg-center min-w-96 relative h-60  mr-8 group cursor-pointer"
+      className="bg-cover bg-center  min-w-80 relative h-60  mr-8 group cursor-pointer"
       style={{
         backgroundImage: `url('${regular.small}')`,
       }}
