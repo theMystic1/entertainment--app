@@ -14,7 +14,7 @@ function Nav({ isopen, handleImgOpen }) {
   }
 
   return (
-    <nav className="w-full h-20 bg-tertiary flex justify-between items-center px-4 fixed top-0 xl:hidden z-50">
+    <nav className="w-full h-20 bg-tertiary flex justify-between items-center px-4 asolute top-0 xl:hidden z-50">
       <Link to="/" className="">
         <img src="/assets/logo.svg" alt="logo" className="" />
       </Link>
