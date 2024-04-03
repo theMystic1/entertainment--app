@@ -1,18 +1,14 @@
-import { useDispatch, useSelector } from "react-redux";
-import { bookmark, toggleBookmarks } from "./homeSlice";
 import HoverPlay from "../../ui/HoverPlay";
+import Spinner from "../../ui/Spinner";
+import { useUpdateBookmarks } from "../../ui/useUpdateBookmarks";
+import { getMessage } from "../../ui/bookmarksMessage";
 
-function RecommendedItems({ menuitem }) {
-  const bookmarks = useSelector(bookmark);
-  const dispatch = useDispatch();
-
-  const { title, isBookMarked, rating, thumbnail, year, category } = menuitem;
+function RecommendedItems({ movie }) {
+  const { title, isbookmarked, id, rating, thumbnail, year, category } = movie;
+  const message = getMessage(title, isbookmarked);
+  const { isBookmarking, mutate } = useUpdateBookmarks(message);
 
   const { regular } = thumbnail;
-
-  function handleClick() {
-    dispatch(toggleBookmarks(menuitem));
-  }
 
   return (
     <div className="relative p-2 text-secondary">
@@ -24,9 +20,12 @@ function RecommendedItems({ menuitem }) {
       >
         <span
           className="bg-primary h-12 w-12 bg-opacity-80 rounded-full absolute right-4 flex items-center justify-center transition duration-500 z-50"
-          onClick={handleClick}
+          onClick={() => mutate(id)}
         >
-          {isBookMarked ? (
+          {isBookmarking ? (
+            <Spinner /> // Display spinner if bookmarking is in progress
+          ) : // Display bookmark icon based on the value of isbookmarked
+          isbookmarked ? (
             <img
               className="w-4 h-5"
               src="/assets/icon-bookmark-full.svg"
@@ -40,6 +39,7 @@ function RecommendedItems({ menuitem }) {
             />
           )}
         </span>
+
         <HoverPlay />
       </div>
 

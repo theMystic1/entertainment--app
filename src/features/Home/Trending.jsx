@@ -1,13 +1,9 @@
-import { useSelector } from "react-redux";
 import TrendingItems from "./TrendingItems";
-import { movies } from "./homeSlice";
+import { useMovies } from "./useMovies";
 
 function Trending() {
-  const moviesList = useSelector(movies);
-
-  const trendingMovies = moviesList.filter(
-    (movies) => movies.isTrending === true
-  );
+  const { movies } = useMovies();
+  const trendingMovies = movies?.filter((movies) => movies.istrending === true);
 
   return (
     <div className="">
@@ -16,8 +12,8 @@ function Trending() {
       </h1>
       <div className="overflow-x-auto mx-auto ">
         <div className="flex justify-between">
-          {trendingMovies.map((movie) => (
-            <TrendingItems movie={movie} key={movie.title} />
+          {trendingMovies?.map((movie) => (
+            <TrendingItems movie={movie} key={movie.id} />
           ))}
         </div>
       </div>

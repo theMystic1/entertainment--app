@@ -1,43 +1,34 @@
-import { useLoaderData } from "react-router-dom";
 import BookMarksSeriesItem from "./BookMarksSeriesItem";
-import { useDispatch, useSelector } from "react-redux";
-import { updateBookmarkedSeries } from "./bookmarksSlice";
-import { useEffect } from "react";
-import { bookmark } from "../Home/homeSlice";
+import { getMoviesCategory } from "../../services/supabase/getMoviesCategories";
+import { useBookmarks } from "./useBookmarks";
+import Loader from "../../ui/Loader";
+import { useSearchQuery } from "../../ui/useSearchQuery";
+import { searchMovies } from "../../services/searchMovies";
 
 function BookmarksSeries({ query }) {
-  const allMovies = useLoaderData();
+  const { isLoading, bookmarkedMovies } = useBookmarks();
+  const filteredBookmarks = getMoviesCategory(bookmarkedMovies, "tv series");
 
-  const dispatch = useDispatch();
-  const bookmarkedSeries = useSelector(bookmark);
-  const bookmarksSeries = useSelector(
-    (state) => state.bookmarks.bookmarkedSeries
-  );
+  let bookmarkedSeries = filteredBookmarks;
+  const searchedSeries = searchMovies(filteredBookmarks, query) || [];
 
-  const bookmarkedNum = bookmarksSeries.length;
+  if (query.length > 0) {
+    bookmarkedSeries = [...searchedSeries];
+  }
 
-  useEffect(
-    function () {
-      const storedMovies = JSON.parse(localStorage.getItem("movies"));
-
-      if (storedMovies) {
-        dispatch(updateBookmarkedSeries(bookmarkedSeries));
-      }
-    },
-    [dispatch, bookmarkedSeries]
-  );
-
-  if (!bookmarkedNum) return null;
+  if (isLoading) return <Loader />;
   return (
     <div className="">
-      <h1 className="text-secondary text-[20px] my-8 sm:text-[32px]">
-        {query.length > 0
-          ? `Found ${bookmarkedNum} Bookmarked series For '${query}' `
-          : "Bookmarked TV Series"}
-      </h1>
+      {bookmarkedSeries.length > 0 && (
+        <h1 className="text-secondary text-[20px] my-8 sm:text-[32px]">
+          {query.length > 0
+            ? `Found ${bookmarkedSeries.length} Bookmarked series For '${query}' `
+            : "Bookmarked TV Series"}
+        </h1>
+      )}
 
       <div className="grid grid-cols phone:grid-cols-2  lg:grid-cols-3 xl:grid-cols-4">
-        {bookmarksSeries.map((series) => (
+        {bookmarkedSeries?.map((series) => (
           <BookMarksSeriesItem series={series} key={series.title} />
         ))}
       </div>

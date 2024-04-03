@@ -1,52 +1,41 @@
-import { getMovies } from "../../services/apiMovies";
+// import { getMovies } from "../../services/apiMovies";
 import MoviesItem from "./MoviesItem";
-import MoviesForm from "./MoviesForm";
-import { useDispatch, useSelector } from "react-redux";
-import { updateMovies } from "./moviesSlice";
-import { useEffect, useState } from "react";
-import { isAuthenticated } from "../Signup/userSlice";
-import { useNavigate, useParams } from "react-router-dom";
+
+import { useOnlyMovies } from "./useOnlyMovies";
+import Loader from "../../ui/Loader";
+import Form from "../../ui/Form";
+import { useState } from "react";
+import { searchMovies } from "../../services/searchMovies";
 
 function Movies() {
+  const { isLoading, moviesMovies = [] } = useOnlyMovies();
   const [query, setQuery] = useState("");
-  const [redirected, setRedirected] = useState(false); // Track if redirection has occurred
-  const navigate = useNavigate();
 
-  const isAuth = useSelector(isAuthenticated);
+  let moviesList = [...moviesMovies];
 
-  useEffect(() => {
-    // Check if user is not authenticated and redirection has not occurred yet
-    if (!isAuth && !redirected) {
-      navigate("/login");
-      setRedirected(true); // Mark redirection as occurred
-    }
-  }, [isAuth, navigate, redirected]);
+  const searchedMovies = searchMovies(moviesMovies, query);
+  if (query.length > 0) {
+    moviesList = [...searchedMovies];
+  }
 
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-    // Check if movies exist in localStorage
-    const storedMovies = JSON.parse(localStorage.getItem("movies"));
-
-    if (storedMovies) {
-      dispatch(updateMovies(storedMovies));
-    }
-  }, [dispatch]);
-  const moviesLists = useSelector((state) => state.movie.moviesList);
-  const moviesLength = moviesLists.length;
+  if (isLoading) return <Loader />;
 
   return (
     <>
       <div className="">
-        <MoviesForm query={query} setQuery={setQuery} />
+        <Form
+          placeholder="Search for movies "
+          query={query}
+          setQuery={setQuery}
+        />
         <h1 className="text-secondary my-8 text-[32px]">
-          {query.length > 0
-            ? `Found ${moviesLength} results for '${query}`
+          {query?.length > 0
+            ? `Found ${moviesList.length} results for '${query}`
             : "Movies"}{" "}
         </h1>
 
         <div className="grid grid-cols phone:grid-cols-2  lg:grid-cols-3 3xl:grid-cols-4">
-          {moviesLists?.map((movie) => (
+          {moviesList?.map((movie) => (
             <MoviesItem movie={movie} key={movie.title} />
           ))}
         </div>
@@ -55,9 +44,9 @@ function Movies() {
   );
 }
 
-export async function loader() {
-  const movies = await getMovies();
-  return movies;
-}
+// export async function loader() {
+//   const movies = await getMovies();
+//   return movies;
+// }
 
 export default Movies;

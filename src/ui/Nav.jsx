@@ -1,15 +1,11 @@
-import { useDispatch } from "react-redux";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { logout } from "../features/Signup/userSlice";
 
 function Nav({ isopen, handleImgOpen }) {
-  const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
   const curPath = location.pathname.split("/")[1];
 
   function handleLogout() {
-    dispatch(logout());
     navigate("/login");
   }
 

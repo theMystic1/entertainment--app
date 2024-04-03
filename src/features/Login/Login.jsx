@@ -3,8 +3,6 @@ import Button from "../../ui/Button";
 import { useNavigate } from "react-router-dom";
 import { validateEmail, validatePassword } from "../../services/userValidation";
 import UserError from "../../ui/UserError";
-import { useDispatch, useSelector } from "react-redux";
-import { isAuthenticated, login } from "../Signup/userSlice";
 
 function Login() {
   const [email, setEmail] = useState("testing@gmail.mail");
@@ -12,8 +10,6 @@ function Login() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const isAuth = useSelector(isAuthenticated);
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -33,24 +29,7 @@ function Login() {
     // Clear error if no validation issues
     setError("");
     setIsLoading(true);
-
-    try {
-      await dispatch(login({ email, password }));
-    } catch (error) {
-      setError("Email or password does not match");
-    } finally {
-      setIsLoading(false);
-    }
   }
-
-  useEffect(
-    function () {
-      if (isAuth) {
-        navigate("/");
-      }
-    },
-    [isAuth, navigate]
-  );
 
   return (
     <div className="flex flex-col gap-8 sm:gap-20 items-center justify-center  px-4 py-20 ">
