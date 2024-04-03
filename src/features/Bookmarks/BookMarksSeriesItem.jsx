@@ -1,20 +1,14 @@
-import { useDispatch, useSelector } from "react-redux";
-import { bookmark, toggleBookmarks } from "../Home/homeSlice";
 import HoverPlay from "../../ui/HoverPlay";
+import { useUpdateBookmarks } from "../../ui/useUpdateBookmarks";
+import Spinner from "../../ui/Spinner";
+import { getMessage } from "../../ui/bookmarksMessage";
 
 function BookMarksSeriesItem({ series }) {
-  const bookmarkedMovies = useSelector(bookmark);
+  const { title, rating, id, thumbnail, isbookmarked, year, category } = series;
 
-  const dispatch = useDispatch();
-  const { title, rating, thumbnail, year, category } = series;
+  const message = getMessage(title, isbookmarked);
 
-  const isBookMarked = bookmarkedMovies.some(
-    (bookmark) => bookmark.title === series.title
-  );
-
-  function handleClick() {
-    dispatch(toggleBookmarks({ title: series.title }));
-  }
+  const { isBookmarking, mutate } = useUpdateBookmarks(message);
 
   const { regular } = thumbnail;
   return (
@@ -27,9 +21,11 @@ function BookMarksSeriesItem({ series }) {
       >
         <span
           className="bg-primary h-12 w-12 bg-opacity-80 rounded-full absolute right-4 flex items-center justify-center z-50"
-          onClick={handleClick}
+          onClick={() => mutate(id)}
         >
-          {isBookMarked ? (
+          {isBookmarking ? (
+            <Spinner />
+          ) : isbookmarked ? (
             <img
               className="w-4 h-5"
               src="/assets/icon-bookmark-full.svg"

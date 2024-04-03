@@ -1,22 +1,16 @@
-import { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { bookmark, toggleBookmarks } from "./homeSlice";
+import { getMessage } from "../../ui/bookmarksMessage";
 import HoverPlay from "../../ui/HoverPlay";
+import Spinner from "../../ui/Spinner";
+import { useUpdateBookmarks } from "../../ui/useUpdateBookmarks";
 // import { isBookOnBookmark } from "../Bookmarks/bookmarksSlice";
 
 function TrendingItems({ movie }) {
-  const bookmarks = useSelector(bookmark);
-  const dispatch = useDispatch();
+  const { title, isbookmarked, id, rating, thumbnail, year, category } = movie;
+  const message = getMessage(title, isbookmarked);
 
-  const { title, isBookMarked, rating, thumbnail, year, category } = movie;
+  const { isBookmarking, mutate } = useUpdateBookmarks(message);
 
   const { regular } = thumbnail;
-
-  function handleClick() {
-    dispatch(toggleBookmarks(movie));
-  }
-
-  // const isBookmark = useSelector(isBookOnBookmark);
 
   return (
     <div
@@ -27,9 +21,11 @@ function TrendingItems({ movie }) {
     >
       <span
         className="bg-primary h-12 w-12 bg-opacity-85 rounded-full absolute right-4 top-4 flex items-center justify-center z-50"
-        onClick={handleClick}
+        onClick={() => mutate(id)}
       >
-        {isBookMarked ? (
+        {isBookmarking ? (
+          <Spinner />
+        ) : isbookmarked ? (
           <img
             className="w-4 h-5"
             src="/assets/icon-bookmark-full.svg"

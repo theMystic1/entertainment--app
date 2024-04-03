@@ -1,52 +1,31 @@
-import { useLoaderData, useNavigate } from "react-router-dom";
-import { getMovies } from "../../services/apiMovies";
+import { useState } from "react";
+import { searchMovies } from "../../services/searchMovies";
+import Form from "../../ui/Form";
+import Loader from "../../ui/Loader";
 import TvseriesItem from "./TvseriesItem";
-import SeriesForm from "./SeriesForm";
-import { useDispatch, useSelector } from "react-redux";
-import { updateSeries } from "./seriesSlice";
-import { useEffect, useState } from "react";
-import { isAuthenticated } from "../Signup/userSlice";
+import { useSeries } from "./useSeries";
 
 function TvSeries() {
   const [query, setQuery] = useState("");
-  const [redirected, setRedirected] = useState(false); // Track if redirection has occurred
-  const navigate = useNavigate();
+  const { isLoading, series = [] } = useSeries();
+  let seriesList = [...series];
 
-  const isAuth = useSelector(isAuthenticated);
-
-  useEffect(() => {
-    // Check if user is not authenticated and redirection has not occurred yet
-    if (!isAuth && !redirected) {
-      navigate("/login");
-      setRedirected(true); // Mark redirection as occurred
-    }
-  }, [isAuth, navigate, redirected]);
-
-  const allMovies = useLoaderData();
-
-  const series = useSelector((state) => state.series.series);
-  const dispatch = useDispatch();
-
-  // Retrieve persisted data from Redux store
-
-  useEffect(() => {
-    // Check if movies exist in localStorage
-    const storedMovies = JSON.parse(localStorage.getItem("movies"));
-
-    if (storedMovies) {
-      dispatch(updateSeries(storedMovies));
-    }
-  }, [dispatch]);
-
-  const seriesLength = series.length;
-
+  const searchedMovies = searchMovies(series, query);
+  if (query.length > 0) {
+    seriesList = [...searchedMovies];
+  }
+  if (isLoading) return <Loader />;
   return (
     <div className="">
-      <SeriesForm setQuery={setQuery} query={query} />
+      <Form
+        placeholder="Search your favorite TV Series"
+        setQuery={setQuery}
+        query={query}
+      />
       <h1 className="text-secondary text-[20px] my-8 sm:text-[32px]">
         {" "}
         {query.length > 0
-          ? `Found ${seriesLength} rsults for '${query}'`
+          ? `Found ${seriesList.length} rsults for '${query}'`
           : "TV Series"}{" "}
       </h1>
 
@@ -57,11 +36,6 @@ function TvSeries() {
       </div>
     </div>
   );
-}
-
-export async function loader() {
-  const movies = await getMovies();
-  return movies;
 }
 
 export default TvSeries;
