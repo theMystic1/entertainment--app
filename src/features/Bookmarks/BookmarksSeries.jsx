@@ -2,7 +2,6 @@ import BookMarksSeriesItem from "./BookMarksSeriesItem";
 import { getMoviesCategory } from "../../services/supabase/getMoviesCategories";
 import { useBookmarks } from "./useBookmarks";
 import Loader from "../../ui/Loader";
-import { useSearchQuery } from "../../ui/useSearchQuery";
 import { searchMovies } from "../../services/searchMovies";
 
 function BookmarksSeries({ query }) {
