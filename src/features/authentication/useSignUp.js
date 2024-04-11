@@ -9,7 +9,7 @@ export function useSignUp() {
   const { mutate: signup, isPending } = useMutation({
     mutationFn: ({ email, password }) => signupApi({ email, password }),
     onSuccess: (user) => {
-      toast.success("Signup successful");
+      toast.success("Signup successful please Login to continue");
       navigate("/login", { replace: true });
     },
   });
