@@ -1,12 +1,15 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useLogout } from "../features/authentication/useLogout";
+import Spinner from "./Spinner";
 
 function Nav({ isopen, handleImgOpen }) {
   const navigate = useNavigate();
   const location = useLocation();
   const curPath = location.pathname.split("/")[1];
 
+  const { isPending: isLoading, logout } = useLogout();
   function handleLogout() {
-    navigate("/login");
+    logout();
   }
 
   return (
@@ -46,21 +49,27 @@ function Nav({ isopen, handleImgOpen }) {
         </NavItem>
       </span>
 
-      <img
-        src="/assets/image-avatar.png"
-        alt="profile-img"
-        className="w-8 ring-offset-white"
-        onClick={handleImgOpen}
-      />
+      {isLoading ? (
+        <Spinner />
+      ) : (
+        <span className="relative">
+          <img
+            src="/assets/image-avatar.png"
+            alt="profile-img"
+            className="w-8 ring-offset-white "
+            onClick={handleImgOpen}
+          />
 
-      <span
-        className={`${
-          isopen ? "block" : "hidden"
-        } absolute z-50 bg-primary h-10 px-4 py-2 flex items-center justify-center text-secondary right-4 bottom-0 rounded-sm cursor-pointer`}
-        onClick={handleLogout}
-      >
-        Logout
-      </span>
+          <button
+            className={`${
+              isopen ? "block" : "hidden"
+            } absolute z-50 bg-primary h-10 px-4 py-2 flex items-center justify-center text-secondary right-[-10px] bottom-[-40px] rounded-sm cursor-pointer `}
+            onClick={handleLogout}
+          >
+            Logout
+          </button>
+        </span>
+      )}
     </nav>
   );
 }

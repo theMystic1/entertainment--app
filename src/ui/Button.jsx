@@ -11,7 +11,7 @@ function Button({ children, to, type, disabled }) {
     <button
       className={`bg-accent text-sm sm:text-xl cursor-pointer text-secondary h-16 rounded-xl transition-all  hover:bg-secondary duration-500 hover:text-primary font-bold ${
         disabled ? "cursor-not-allowed" : "cursor-pointer"
-      }`}
+      } flex items-center justify-center`}
       type={type}
       disabled={disabled}
     >

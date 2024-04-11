@@ -6,17 +6,17 @@ import Loader from "./Loader";
 import { useState } from "react";
 
 function AppLayout() {
-  const navigation = useNavigation();
+  // const navigation = useNavigation();
   const [isopen, setIsOpen] = useState(false);
 
   function handleImgOpen() {
     setIsOpen((iso) => !iso);
   }
-  const isLoading = navigation.state === "loading";
+  // const isLoading = navigation.state === "loading";
 
   return (
     <div className="bg-primary h-full  relative z-40">
-      {isLoading && <Loader />}
+      {/* {isLoading && <Loader />} */}
       <header className=" ">
         <Nav isopen={isopen} handleImgOpen={handleImgOpen} />
       </header>

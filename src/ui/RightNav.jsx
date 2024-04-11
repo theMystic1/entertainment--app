@@ -1,4 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
+import { useLogout } from "../features/authentication/useLogout";
+import Spinner from "./Spinner";
 
 const iconPaths = {
   "/": {
@@ -23,6 +25,8 @@ function RightNav({ isopen, handleImgOpen }) {
   const location = useLocation();
   const curPath = location.pathname;
 
+  const { isPending: isLoading, logout } = useLogout();
+
   return (
     <nav className="w-20 h-[60rem] bg-tertiary hidden gap-20 items-center px-4 flex-col relative top-8 xl:flex left-0 rounded-lg py-8 z-40">
       <Link to="/" className="group">
@@ -46,19 +50,25 @@ function RightNav({ isopen, handleImgOpen }) {
       </span>
 
       <span className="absolute bottom-8" onClick={handleImgOpen}>
-        <img
-          src="/assets/image-avatar.png"
-          alt="profile-img"
-          className="w-8 ring-offset-white"
-        />
-        <Link
-          to="/login"
-          className={`${
-            isopen ? "block" : "hidden"
-          }  z-50 bg-primary h-10 px-4 py-2 flex items-center justify-center text-secondary rounded-sm absolute left-[-20px]`}
-        >
-          Logout
-        </Link>
+        {isLoading ? (
+          <Spinner />
+        ) : (
+          <>
+            <img
+              src="/assets/image-avatar.png"
+              alt="profile-img"
+              className="w-8 ring-offset-white cursor-pointer"
+            />
+            <button
+              className={`${
+                isopen ? "block" : "hidden"
+              }  z-50 bg-primary h-10 px-4 py-2 flex items-center justify-center text-secondary rounded-sm absolute left-[-20px] cursor-pointer`}
+              onClick={logout}
+            >
+              Logout
+            </button>
+          </>
+        )}
       </span>
     </nav>
   );

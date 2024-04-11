@@ -1,4 +1,4 @@
-import { RouterProvider, createBrowserRouter } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Home from "./features/Home/Home";
 import Signup from "./features/Signup/Signup";
 import Login from "./features/Login/Login";
@@ -9,6 +9,7 @@ import AppLayout from "./ui/AppLayout";
 import Error from "./ui/Error";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "react-hot-toast";
+import ProtectedRoutes from "./ui/ProtectedRoutes";
 // import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 const queryClient = new QueryClient({
@@ -20,51 +21,34 @@ const queryClient = new QueryClient({
 });
 
 function App() {
-  const router = createBrowserRouter([
-    {
-      path: "/signup",
-      element: <Signup />,
-    },
-    {
-      path: "/login",
-      element: <Login />,
-    },
-
-    {
-      element: <AppLayout />,
-      errorElement: <Error />,
-      children: [
-        {
-          path: "/",
-          element: <Home />,
-          // loader: menuLoader,
-        },
-
-        {
-          path: "/movies",
-          element: <Movies />,
-          // loader: moviesLoader,
-        },
-        {
-          path: "/bookmarks",
-          element: <Bookmarks />,
-          // loader: bookmarksLoader,
-        },
-        {
-          path: "/tvseries",
-          element: <TvSeries />,
-          // loader: seriesLoader,
-        },
-      ],
-    },
-  ]);
-
   return (
     <QueryClientProvider client={queryClient}>
       {/* <ReactQueryDevtools initialIsOpen={false} /> */}
-      <RouterProvider router={router} />;
+      {/* <RouterProvider router={router} />; */}
+      <BrowserRouter>
+        <Routes>
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/login" element={<Login />} />
+
+          <Route
+            element={
+              <ProtectedRoutes>
+                <AppLayout />
+              </ProtectedRoutes>
+            }
+          >
+            <Route index element={<Navigate replace to="/home" />} />
+
+            <Route path="/home" element={<Home />} />
+            <Route path="/movies" element={<Movies />} />
+            <Route path="/bookmarks" element={<Bookmarks />} />
+            <Route path="/tvseries" element={<TvSeries />} />
+          </Route>
+        </Routes>
+      </BrowserRouter>
+
       <Toaster
-        position="top-center"
+        position="top-right"
         gutter={12}
         containerStyle={{
           margin: "8px",

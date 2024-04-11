@@ -1,49 +1,25 @@
 import React, { useState } from "react";
 import Button from "../../ui/Button";
-import { useNavigate } from "react-router-dom";
 import UserError from "../../ui/UserError";
-import { validateEmail, validatePassword } from "../../services/userValidation";
+import { useForm } from "react-hook-form";
+import { useSignUp } from "../authentication/useSignUp";
+import Spinner from "../../ui/Spinner";
+// import { validateEmail, validatePassword } from "../../services/userValidation";
 
 function Signup() {
-  const [email, setEmail] = useState("testing@gmail.mail");
-  const [password, setPassword] = useState("curiosity");
-  const [repeatPassword, setRepeatPassword] = useState("curiosity");
-  const [isLoading, setIsLoading] = useState(false); // Corrected initialization
-  const [error, setError] = useState("");
-  const navigate = useNavigate();
-
-  function handleSubmit(e) {
-    e.preventDefault();
-
-    // Validate email
-    if (!validateEmail(email)) {
-      setError("Please enter a valid email address");
-      return;
-    }
-
-    // Validate password
-    if (!validatePassword(password)) {
-      setError("Password must be at least 8 characters long");
-      return;
-    }
-
-    // Check if passwords match
-    if (password !== repeatPassword) {
-      setError("Passwords do not match");
-      return;
-    }
-
-    // Clear error if no validation issues
-    setError("");
-
-    // Set loading state
-    setIsLoading(true);
-
-    // Proceed with signup process
-    setTimeout(() => {
-      navigate("/login");
-    }, 1000);
+  const { isPending: isLoading, signup } = useSignUp();
+  const { register, handleSubmit, formState, reset, getValues } = useForm();
+  // /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  function onSubmit({ email, password }) {
+    signup(
+      { email, password },
+      {
+        onSettled: () => reset(),
+      }
+    );
   }
+
+  const { errors: error } = formState;
 
   return (
     <div className="flex flex-col gap-8 sm:gap-20 items-center justify-center py-8 px-4 sm:py-20 relative">
@@ -55,42 +31,65 @@ function Signup() {
         </h1>
         <form
           className="flex flex-col gap-8 justify-center"
-          onSubmit={handleSubmit}
+          onSubmit={handleSubmit(onSubmit)}
         >
-          <div className="border-b-2 border-b-gray py-2">
+          <div className="border-b-2 border-b-gray py-2 relative">
             <input
               type="text"
               placeholder="Email address"
               className="w-full placeholder:pl-8 sm:placeholder:text-xl bg-tertiary text-secondary sm:pt-8 px-2 outline-none"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              id="email"
+              {...register("email", {
+                required: "This field is required",
+                pattern: {
+                  value: /\S+@\S+\.\S+/,
+                  message: "Please provide a valid email address",
+                },
+              })}
+              disabled={isLoading}
             />
+            <UserError>{error?.email?.message}</UserError>
           </div>
 
-          <div className="border-b-2 border-b-gray py-2">
+          <div className="border-b-2 border-b-gray py-2 relative">
             <input
               type="password"
               placeholder="Password"
               className="w-full placeholder:pl-8 sm:placeholder:text-xl bg-tertiary text-secondary  sm:pt-8 px-2 outline-none"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              id="password"
+              {...register("password", {
+                required: "This field is required",
+                minLength: {
+                  value: 8,
+                  message: "Password needs a minimum of 8 characters",
+                },
+              })}
+              disabled={isLoading}
             />
+
+            <UserError>{error?.password?.message}</UserError>
           </div>
-          <div className="border-b-2 border-b-gray py-2">
+          <div className="border-b-2 border-b-gray py-2 relative">
             <input
               type="password"
               placeholder="Repeat Password"
               className="w-full placeholder:pl-8 sm:placeholder:text-xl bg-tertiary text-secondary  sm:pt-8 px-2 outline-none"
-              value={repeatPassword}
-              onChange={(e) => setRepeatPassword(e.target.value)}
+              id="repeatPassword"
+              {...register("repeatPassword", {
+                required: "This field is required",
+                validate: (value) =>
+                  value === getValues().password || "passwords need to match",
+              })}
+              disabled={isLoading}
             />
+
+            <UserError>{error?.repeatPassword?.message}</UserError>
           </div>
 
           <Button type="submit" disabled={isLoading}>
-            {isLoading ? "Creating your account..." : "Create an account"}
+            {isLoading ? <Spinner /> : "Create an account"}
           </Button>
         </form>
-        {error && <UserError>{error}</UserError>}
         <div className="text-center text-secondary flex flex-wrap text-xl justify-center">
           <span className="mr-4 text-lg sm:text-xl">
             Don't have an account?

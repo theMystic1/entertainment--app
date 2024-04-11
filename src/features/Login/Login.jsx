@@ -1,34 +1,29 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Button from "../../ui/Button";
-import { useNavigate } from "react-router-dom";
-import { validateEmail, validatePassword } from "../../services/userValidation";
+
 import UserError from "../../ui/UserError";
+import { useLogin } from "../authentication/useLogin";
+import Spinner from "../../ui/Spinner";
 
 function Login() {
-  const [email, setEmail] = useState("testing@gmail.mail");
-  const [password, setPassword] = useState("curiosity");
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
-  const navigate = useNavigate();
+  const { isPending: isLoading, login } = useLogin();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error] = useState("");
 
-  async function handleSubmit(e) {
+  function handleSubmit(e) {
     e.preventDefault();
 
-    // Validate email
-    if (!validateEmail(email)) {
-      setError("Please enter a valid email address");
-      return;
-    }
-
-    // Validate password
-    if (!validatePassword(password)) {
-      setError("Password must be at least 8 characters long");
-      return;
-    }
-
-    // Clear error if no validation issues
-    setError("");
-    setIsLoading(true);
+    if (!email || !password) return;
+    login(
+      { email, password },
+      {
+        onSettled: () => {
+          setEmail("");
+          setPassword("");
+        },
+      }
+    );
   }
 
   return (
@@ -50,6 +45,7 @@ function Login() {
               className="w-full placeholder:pl-8 sm:placeholder:text-xl bg-tertiary text-secondary  sm:pt-8 px-2 outline-none"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              disabled={isLoading}
             />
           </div>
 
@@ -60,12 +56,11 @@ function Login() {
               className="w-full placeholder:pl-8 sm:placeholder:text-xl bg-tertiary text-secondary  sm:pt-8 px-2 outline-none"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              disabled={isLoading}
             />
           </div>
 
-          <Button>
-            {isLoading ? "Logging you in..." : "Login to your account"}
-          </Button>
+          <Button>{isLoading ? <Spinner /> : "Login to your account"}</Button>
         </form>
         {error && <UserError>{error}</UserError>}
         <div className="text-center text-secondary flex flex-wrap text-xl justify-center">
